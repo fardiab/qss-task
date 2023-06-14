@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 class Sect(models.Model):
@@ -32,3 +33,19 @@ class Indica(models.Model):
     class Meta:
         verbose_name = 'Indicator'
         verbose_name_plural = 'Indicators'
+
+class CountryRank(models.Model):
+    year = models.CharField(max_length=255)
+    sector = models.CharField(max_length=255)
+    subsector = models.CharField(max_length=255)
+    indicator = models.CharField(max_length=255)
+    amount = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    rank = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.country
+
+    class Meta:
+        verbose_name = 'Country Rank'
+        verbose_name_plural = 'Country Ranks'

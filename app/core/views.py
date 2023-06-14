@@ -1,6 +1,10 @@
 from django.shortcuts import render
+import pandas as pd
+from django.http import JsonResponse
+from csv import DictReader 
+from django.db import transaction
 
-from .models import Sect, SubSect, Indica
+from .models import Sect, SubSect, Indica, CountryRank
 
 def all(request):
     sectors = Sect.objects.all()
@@ -102,3 +106,32 @@ def text(request, pk):
         'indicator': indicator,
     }
     return render(request, 'indicators/text.html', context=context)
+
+
+# def country_rank_data(csv_file_path):
+#     batch_size = 1000  # Define the batch size according to your needs
+
+#     with open(csv_file_path, 'r') as file:
+#         reader = DictReader(file)
+#         data = list(reader)
+
+#     with transaction.atomic():
+#         for i in range(0, len(data), batch_size):
+#             batch = data[i:i+batch_size]
+#             CountryRank.objects.bulk_create([
+#                 CountryRank(
+#                     year=row['Year'],
+#                     sector=row['Sector'],
+#                     subsector=row['Subsector'],
+#                     indicator=row['Indicator'],
+#                     amount=row['Amount'],
+#                     country=row['Country'],
+#                     rank=row['Rank']
+#                 )
+#                 for row in batch
+#             ])
+
+# # Usage example:
+# csv_file_path = 'data/MergedDataset.csv'
+# country_rank_data(csv_file_path)
+
