@@ -2,13 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import Prefetch
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-
-
-from core.models import Sect, SubSect, Indica, CountryRank
-from .serializers import SectSerializer, SubSectSerializer, IndicaSerializer, CountryRankSerializer
+from core.models import Sect, SubSect, Indica, Country
+from .serializers import SectSerializer, SubSectSerializer, IndicaSerializer, CountrySerializer
 
 class SectViewSet(viewsets.ModelViewSet):
     serializer_class = SectSerializer
@@ -26,7 +21,6 @@ class SubSectApiView(APIView):
         subsector = SubSect.objects.all()
         serializer = SubSectSerializer(subsector, many=True)
         return Response(serializer.data)
-    
     
 class IndicaApiView(APIView):
     serializer_class = IndicaSerializer
@@ -79,50 +73,14 @@ class IndicaApiView(APIView):
                 data.append(sector_data)
             return Response(data)
 
-# class CountryRankApiView(APIView):
-#     serializer_class = CountryRankSerializer
 
-#     def get(self, request, pk=None):
-#         if pk is not None:
-#             try:
-#                 country_rank = CountryRank.objects.get(pk=pk)
-#                 serializer = CountryRankSerializer(country_rank)
-#                 return Response(serializer.data)
-#             except CountryRank.DoesNotExist:
-#                 return Response(
-#                     {"error": "Country rank not found."},
-#                     status=status.HTTP_404_NOT_FOUND
-#                 )
+class CountryApiView(APIView):
+    serializer_class = CountrySerializer
 
-#         country_ranks = CountryRank.objects.all()
-#         serializer = CountryRankSerializer(country_ranks, many=True)
-#         return Response(serializer.data)
-
-
-class CountryRankApiView(APIView):
-    
-    def get(self, request):
-        country_ranks = CountryRank.objects.all()
-
-        data = {
-            'data': [],
-        }
-
-        for rank in country_ranks:
-            data['data'].append(rank.year)
-            # data['data'].append(rank.sector)
-            # data['data'].append(rank.subsector)
-            # data['data'].append(rank.indicator)
-            # data['data'].append(rank.amount)
-            data['data'].append(rank.country)
-            data['data'].append(rank.rank)
-
-        response = {
-            'data': data,
-        }
-
-        return Response(response)
-
+    def get(self, request, pk=None):
+        queryset = Country.objects.all()
+        serializer = CountrySerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 

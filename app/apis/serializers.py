@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Sect, SubSect, Indica, CountryRank
+from core.models import Sect, SubSect, Indica, Country
 
 
 class SectSerializer(serializers.ModelSerializer):
@@ -24,7 +24,9 @@ class IndicaSerializer(serializers.ModelSerializer):
         model = Indica
         exclude = ('description',)
 
-class CountryRankSerializer(serializers.ModelSerializer):
+class CountrySerializer(serializers.ModelSerializer):
+    indicator = serializers.StringRelatedField()
+
     class Meta:
-        model = CountryRank
+        model = Country
         fields = '__all__'

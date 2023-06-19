@@ -51,9 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #third party apps
     'rest_framework',
     'rest_framework_swagger',
     'debug_toolbar',
+    'django_filters',
+    'django_countries',
+    #local apps
     'core',
     'apis',
     
@@ -91,14 +95,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
+#Rest Framework
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'qss',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': "localhost",
+        'PORT': '5432',
     }
 }
 

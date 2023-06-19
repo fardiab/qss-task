@@ -4,134 +4,89 @@ from django.http import JsonResponse
 from csv import DictReader 
 from django.db import transaction
 
-from .models import Sect, SubSect, Indica, CountryRank
+from .models import Sect, SubSect, Indica, Country
 
 def all(request):
-    sectors = Sect.objects.all()
-    subsectors = SubSect.objects.all()
-    indicators = Indica.objects.all()
-    context = {
-        'sectors': sectors,
-        'subsectors': subsectors,
-        'indicators': indicators,
-    }
-    return render(request, 'first_page.html', context=context)
+    data = pd.read_csv('data/MergedDataset.csv')
 
-def agriculture(request):
-    subsectors = SubSect.objects.filter(sector__sector='Agriculture')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/agriculture_subsec.html', context=context)
+    # for _, row in data.iterrows():
+    #     indicator_name = row['Indicator']
+    #     year_name = row['Year']
 
-def army(request):
-    subsectors = SubSect.objects.filter(sector__sector='Army')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/army_subsec.html', context=context)
+    #     # Get the corresponding Country instance
+    #     indicator = Indica.objects.get(indicator=indicator_name)
+
+    #     # Create and save the Amount instance with the related country and amount value
+    #     year_name = Year.objects.create(indicator=indicator, year=year_name)
+    #     year_name.save()
 
 
-def economy(request):
-    subsectors = SubSect.objects.filter(sector__sector='Economy')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/economy_subsec.html', context=context)
+    # subsectors = data[['Sector', 'Subsector']].drop_duplicates()
 
-def government(request):
-    subsectors = SubSect.objects.filter(sector__sector='Government')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/government_subsec.html', context=context)
+    # # Create and save instances of SubSect model for each subsector
+    # for _, row in subsectors.iterrows():
+    #     sector_name = row['Sector']
+    #     subsector_name = row['Subsector']
 
-def health(request):
-    subsectors = SubSect.objects.filter(sector__sector='Health')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-        }
-    return render(request, 'subsectors/health_subsec.html', context=context)
+    #     # Get the corresponding Sect instance
+    #     sector = Sect.objects.get(sector=sector_name)
 
-def social(request):
-    subsectors = SubSect.objects.filter(sector__sector='Social')
-    indicators = Indica.objects.all()
-    context = {
+    #     # Create and save the SubSect instance with the related sector
+    #     subsect = SubSect.objects.create(sector=sector, subsector=subsector_name)
+    #     subsect.save()
 
-            'subsectors': subsectors,
+    # Extract unique indicators
+    # indicators = data[['Sector', 'Subsector', 'Indicator']].drop_duplicates()
 
-            }
-    return render(request, 'subsectors/social_subsec.html', context=context)
+    # # Create and save instances of Indica model for each indicator
+    # for _, row in indicators.iterrows():
+    #     sector_name = row['Sector']
+    #     subsector_name = row['Subsector']
+    #     indicator_name = row['Indicator']
 
-def technology(request):
-    subsectors = SubSect.objects.filter(sector__sector='Technology')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/technology_subsec.html', context=context)
+    #     # Get the corresponding SubSect instance
+    #     subsect = SubSect.objects.get(sector__sector=sector_name, subsector=subsector_name)
 
-def transportation(request):
-    subsectors = SubSect.objects.filter(sector__sector='Transportation')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/transportation_subsec.html', context=context)
+    #     # Create and save the Indica instance with the related subsector and indicator names
+    #     indica = Indica.objects.create(subsector=subsect, indicator=indicator_name)
+    #     indica.save()
 
-def other(request):
-    subsectors = SubSect.objects.filter(sector__sector='Other')
-    indicators = Indica.objects.all()
-    context = {
-        'subsectors': subsectors,
-    }
-    return render(request, 'subsectors/other_subsec.html', context=context)
+    # Extract unique sectors
+    # amounts = data['Sector'].unique()
+    
+    # # Create and save instances of Sect model for each sector
+    # for sector in amounts:
+    #     date = Sect.objects.create(sector=sector)
+    #     date.save()
 
 
-def details(request, pk):
-    indicator = Indica.objects.filter(subsector=pk)
-    context = {
-        'indicator': indicator,
-    }
-    return render(request, 'indicators/details.html', context=context)
+    # csv_file_path = 'data/MergedDataset.csv'
+    # batch_size = 5000  # Define the batch size according to your needs
 
-def text(request, pk):
-    indicator = Indica.objects.filter(pk=pk)
-    context = {
-        'indicator': indicator,
-    }
-    return render(request, 'indicators/text.html', context=context)
+    # with pd.read_csv(csv_file_path, chunksize=batch_size) as reader:
+    #     year_instances = []
+    #     for chunk in reader:
+    #         for _, row in chunk.iterrows():
+    #             indicator_name = row['Indicator']
+    #             country_name = row['Country']
+    #             rank = row['Rank']
+    #             amount = row['Amount']
+    #             year = row['Year']
+    
+    #             # Get the corresponding Country instance
+    #             indicator = Indica.objects.get(indicator=indicator_name) if indicator_name else None
+    
+    #             # Create the Year instance with the related indicator and year value
+    #             year_instance = Country(indicator=indicator, year=year, rank=rank, amount=amount, country=country_name)
+    #             year_instances.append(year_instance)
+    
+    #         # Bulk create Year instances for each chunk
+    #         Country.objects.bulk_create(year_instances)
+    #         year_instances = []  # Reset the list for the next chunk
+    
+    return render(request, 'first_page.html')
+    
 
 
-# def country_rank_data(csv_file_path):
-#     batch_size = 1000  # Define the batch size according to your needs
 
-#     with open(csv_file_path, 'r') as file:
-#         reader = DictReader(file)
-#         data = list(reader)
-
-#     with transaction.atomic():
-#         for i in range(0, len(data), batch_size):
-#             batch = data[i:i+batch_size]
-#             CountryRank.objects.bulk_create([
-#                 CountryRank(
-#                     year=row['Year'],
-#                     sector=row['Sector'],
-#                     subsector=row['Subsector'],
-#                     indicator=row['Indicator'],
-#                     amount=row['Amount'],
-#                     country=row['Country'],
-#                     rank=row['Rank']
-#                 )
-#                 for row in batch
-#             ])
-
-# # Usage example:
-# csv_file_path = 'data/MergedDataset.csv'
-# country_rank_data(csv_file_path)
 
