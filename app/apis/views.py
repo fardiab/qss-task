@@ -2,12 +2,15 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import F, IntegerField, ExpressionWrapper
+from django.db.models.functions import Cast
 from core.models import Sect, SubSect, Indica, Country
 from .serializers import (
     SectSerializer,
     SubSectSerializer,
     IndicaSerializer,
     CountrySerializer,
+    RankDiffrenceSerializer,
 )
 
 
@@ -93,11 +96,15 @@ class CountryApiView(APIView):
         count = int(request.GET.get("count", 0))
         selected_country = request.GET.getlist("country")
         year = request.GET.get("year", None)
+        indicator = request.GET.getlist("indicator", None)
 
         queryset = Country.objects.all()
 
+        if indicator:
+            queryset = queryset.filter(indicator__indicator__in=indicator)
+
         if selected_country:
-            queryset = Country.objects.filter(country__in=selected_country)
+            queryset = queryset.filter(country__in=selected_country)
 
         if year:
             queryset = queryset.filter(year=year)
@@ -105,5 +112,41 @@ class CountryApiView(APIView):
         if count:
             queryset = queryset.order_by("-id")[:count]
 
+        if not queryset.exists():
+            return Response({"error": "No data found"}, status=404)
+
         serializer = CountrySerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class RankDifferenceApiView(APIView):
+    serializer_class = RankDiffrenceSerializer
+
+    def get(self, request):
+        selected_country = request.GET.get("country")
+        indicator = request.GET.get("indicator")
+        year1 = request.GET.get("year1")
+        year2 = request.GET.get("year2")
+
+        queryset1 = Country.objects.filter(indicator__indicator=indicator, country=selected_country, year=year1)
+        queryset2 = Country.objects.filter(indicator__indicator=indicator, country=selected_country, year=year2)
+
+        rank_diff = None
+        if queryset1.exists() and queryset2.exists():
+            rank_diff1 = queryset1.first().rank
+            rank_diff2 = queryset2.first().rank
+            rank_diff = rank_diff1 - rank_diff2
+
+        if rank_diff is None:
+            return Response({"error": "No data found"}, status=404)
+
+        return Response({
+            "country": selected_country,
+            "year1": year1,
+            "year2" : year2,
+            "rank_difference": rank_diff,
+            })
+
+        
+
+        
