@@ -6,7 +6,7 @@ from core.models import Sect, SubSect, Indica, Country
 class SectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sect
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SubSectSerializer(serializers.ModelSerializer):
@@ -14,19 +14,25 @@ class SubSectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubSect
-        fields = '__all__'
+        fields = "__all__"
 
 
 class IndicaSerializer(serializers.ModelSerializer):
     subsector = serializers.StringRelatedField()
-    
+
     class Meta:
         model = Indica
-        exclude = ('description',)
+        exclude = ("description",)
+
 
 class CountrySerializer(serializers.ModelSerializer):
     indicator = serializers.StringRelatedField()
 
     class Meta:
         model = Country
-        fields = '__all__'
+        fields = "__all__"
+
+class RankDiffrenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ("country", "rank", "year")
