@@ -2,8 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db.models import F, IntegerField, ExpressionWrapper
-from django.db.models.functions import Cast
+from django.db.models import F, IntegerField, ExpressionWrapper, Max
+from django.core import serializers
+import json
 from core.models import Sect, SubSect, Indica, Country
 from .serializers import (
     SectSerializer,
@@ -123,30 +124,83 @@ class RankDifferenceApiView(APIView):
     serializer_class = RankDiffrenceSerializer
 
     def get(self, request):
-        selected_country = request.GET.get("country")
+        selected_countries = request.GET.getlist("country")
         indicator = request.GET.get("indicator")
         year1 = request.GET.get("year1")
         year2 = request.GET.get("year2")
 
-        queryset1 = Country.objects.filter(indicator__indicator=indicator, country=selected_country, year=year1)
-        queryset2 = Country.objects.filter(indicator__indicator=indicator, country=selected_country, year=year2)
+        rank_diff_by_country = {}
 
-        rank_diff = None
-        if queryset1.exists() and queryset2.exists():
-            rank_diff1 = queryset1.first().rank
-            rank_diff2 = queryset2.first().rank
-            rank_diff = rank_diff1 - rank_diff2
+        for country in selected_countries:
+            queryset1 = Country.objects.filter(
+                indicator__indicator=indicator, country=country, year=year1
+            )
+            queryset2 = Country.objects.filter(
+                indicator__indicator=indicator, country=country, year=year2
+            )
 
-        if rank_diff is None:
-            return Response({"error": "No data found"}, status=404)
+            rank_diff = None
+            if queryset1.exists() and queryset2.exists():
+                rank_diff1 = queryset1.first().rank
+                rank_diff2 = queryset2.first().rank
+                rank_diff = rank_diff1 - rank_diff2
 
-        return Response({
-            "country": selected_country,
-            "year1": year1,
-            "year2" : year2,
-            "rank_difference": rank_diff,
-            })
+            if rank_diff is None:
+                rank_diff = "No data found"
 
-        
+            rank_diff_by_country[country] = rank_diff
 
-        
+        return Response(
+            {"year1": year1, "year2": year2, "rank_diff": rank_diff_by_country}
+        )
+
+
+class CountryInfoApiView(APIView):
+    serializer_class = CountrySerializer
+
+    def get(self, request):
+        selected_country = request.GET.get("country")
+        year = request.GET.get("year")
+        sector = request.GET.get("sector")
+        subsector = request.GET.get("subsector")
+
+        indicators_data = Country.objects.filter(
+            country=selected_country,
+            year=year,
+            indicator__subsector__subsector=subsector,
+            indicator__subsector__sector__sector=sector,
+        )
+
+        response_data = []
+        for data in indicators_data:
+            sect = Sect.objects.get(subsect__indica__indicator=data.indicator.indicator)
+            sector_json = serializers.serialize("json", [sect])
+            subsector_json = serializers.serialize("json", [data.indicator.subsector])
+            sector_dict = json.loads(sector_json)[0]["fields"]["sector"]
+            subsector_dict = json.loads(subsector_json)[0]["fields"]["subsector"]
+
+            score = round(
+                abs(
+                    1
+                    - data.rank
+                    / Country.objects.filter(
+                        year=year,
+                        indicator__subsector__subsector=subsector,
+                        indicator__subsector__sector__sector=sector,
+                    ).aggregate(max_rank=Max("rank"))["max_rank"]
+                )
+                * 100
+            )
+
+            indicator_info = {
+                # "sector": sector_dict,
+                # "subsector": subsector_dict,
+                data.indicator.indicator: score,
+                # "country": data.country,
+                # "year": data.year,
+                # "rank": data.rank,
+                # "score": score,
+            }
+            response_data.append(indicator_info)
+
+        return Response(response_data)

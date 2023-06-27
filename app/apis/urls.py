@@ -9,5 +9,6 @@ urlpatterns = [
     path('indicators/<int:pk>/', views.IndicaApiView.as_view(), name='indicators-detail'),
     path('country/', views.CountryApiView.as_view(), name='country'),
     path('rank-difference/', views.RankDifferenceApiView.as_view(), name='rank_difference'),
+    path('country-info/', views.CountryInfoApiView.as_view(), name='country_info'),
     # path('country-ranks/<int:pk>/', views.CountryRankApiView.as_view(), name='country-ranks-detail'),
 ]
