@@ -10,5 +10,7 @@ urlpatterns = [
     path('country/', views.CountryApiView.as_view(), name='country'),
     path('rank-difference/', views.RankDifferenceApiView.as_view(), name='rank_difference'),
     path('country-info/', views.CountryInfoApiView.as_view(), name='country_info'),
+    path('country-diagram/', views.CountryIndicaDiagramApiView.as_view(), name='country_diagram'),
+    path('country-rank-difference/', views.CountryIndicaRankDifferenceApiView.as_view(), name='country_rank_difference'),
     # path('country-ranks/<int:pk>/', views.CountryRankApiView.as_view(), name='country-ranks-detail'),
 ]

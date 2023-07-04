@@ -169,38 +169,133 @@ class CountryInfoApiView(APIView):
             year=year,
             indicator__subsector__subsector=subsector,
             indicator__subsector__sector__sector=sector,
+        ).values("indicator__indicator", "rank")
+
+        max_ranks = (
+            Country.objects.filter(
+                year=year,
+                indicator__subsector__subsector=subsector,
+                indicator__subsector__sector__sector=sector,
+            )
+            .values("indicator__indicator")
+            .annotate(max_rank=Max("rank"))
         )
+
+        max_rank_dict = {
+            item["indicator__indicator"]: item["max_rank"] for item in max_ranks
+        }
 
         response_data = []
         for data in indicators_data:
-            sect = Sect.objects.get(subsect__indica__indicator=data.indicator.indicator)
-            sector_json = serializers.serialize("json", [sect])
-            subsector_json = serializers.serialize("json", [data.indicator.subsector])
-            sector_dict = json.loads(sector_json)[0]["fields"]["sector"]
-            subsector_dict = json.loads(subsector_json)[0]["fields"]["subsector"]
-
-            score = round(
-                abs(
-                    1
-                    - data.rank
-                    / Country.objects.filter(
-                        year=year,
-                        indicator__subsector__subsector=subsector,
-                        indicator__subsector__sector__sector=sector,
-                    ).aggregate(max_rank=Max("rank"))["max_rank"]
-                )
-                * 100
-            )
+            max_rank = max_rank_dict[data["indicator__indicator"]]
+            score = round((1 - data["rank"] / max_rank) * 100, 2)
 
             indicator_info = {
-                # "sector": sector_dict,
-                # "subsector": subsector_dict,
-                data.indicator.indicator: score,
-                # "country": data.country,
-                # "year": data.year,
-                # "rank": data.rank,
-                # "score": score,
+                "sector": sector,
+                "subsector": subsector,
+                "indicator": data["indicator__indicator"],
+                "score": score,
             }
+            response_data.append(indicator_info)
+
+        return Response(response_data)
+
+
+class CountryIndicaDiagramApiView(APIView):
+    serializer_class = CountrySerializer
+
+    def get(self, request):
+        selected_country = request.GET.get("country")
+        sector = request.GET.get("sector")
+        subsector = request.GET.get("subsector")
+        indicator_names = request.GET.getlist("indicator")
+
+        indicator_ids = Indica.objects.filter(
+            indicator__in=indicator_names
+        ).values_list("id", flat=True)
+
+        queryset = Country.objects.filter(
+            country=selected_country,
+            indicator__id__in=indicator_ids,
+            indicator__subsector__subsector=subsector,
+            indicator__subsector__sector__sector=sector,
+        ).values("indicator__indicator", "year", "rank")
+
+        max_ranks = (
+            Country.objects.filter(
+                indicator__subsector__subsector=subsector,
+                indicator__subsector__sector__sector=sector,
+                indicator__id__in=indicator_ids,
+            )
+            .values("indicator__indicator")
+            .annotate(max_rank=Max("rank"))
+        )
+
+        max_rank_dict = {
+            item["indicator__indicator"]: item["max_rank"] for item in max_ranks
+        }
+
+        response_data = []
+        for data in queryset:
+            max_rank = max_rank_dict[data["indicator__indicator"]]
+            score = round((1 - data["rank"] / max_rank) * 100, 2)
+
+            indicator_info = {
+                "indicator": data["indicator__indicator"],
+                "year": data["year"],
+                "score": score,
+            }
+            response_data.append(indicator_info)
+
+        return Response(response_data)
+
+
+class CountryIndicaRankDifferenceApiView(APIView):
+    serializer_class = CountrySerializer
+
+    def get(self, request):
+        selected_country = request.GET.get("country")
+        year1 = request.GET.get("year1")
+        year2 = request.GET.get("year2")
+        sector = request.GET.get("sector")
+        subsector = request.GET.get("subsector")
+
+        indicators = Indica.objects.filter(
+            subsector__subsector=subsector, subsector__sector__sector=sector
+        ).values_list("indicator", flat=True)
+
+        queryset1 = Country.objects.filter(
+            indicator__subsector__sector__sector=sector,
+            indicator__subsector__subsector=subsector,
+            country=selected_country,
+            year=year1,
+        ).prefetch_related("indicator")
+
+        queryset2 = Country.objects.filter(
+            indicator__subsector__sector__sector=sector,
+            indicator__subsector__subsector=subsector,
+            country=selected_country,
+            year=year2,
+        ).prefetch_related("indicator")
+
+        indicator_rank_dict = {}
+        for country1, country2 in zip(queryset1, queryset2):
+            indicator_rank_dict[(country1.indicator.indicator, country1.year)] = country1.rank
+            indicator_rank_dict[(country2.indicator.indicator, country2.year)] = country2.rank
+
+        response_data = []
+        for indicator in indicators:
+            rank_diff = None
+            rank1 = indicator_rank_dict.get((indicator, year1))
+            rank2 = indicator_rank_dict.get((indicator, year2))
+            if rank1 is not None and rank2 is not None:
+                rank_diff = rank1 - rank2
+
+            indicator_info = {
+                "indicator": indicator,
+                "rank_diff": rank_diff,
+            }
+
             response_data.append(indicator_info)
 
         return Response(response_data)
