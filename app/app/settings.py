@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'token_auth_app.apps.TokenAuthAppConfig',
     # third party apps
     "graphene_django",
     "rest_framework",
@@ -44,6 +45,9 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_filters",
     "django_countries",
+    'channels',
+    'rest_framework.authtoken',
+    'corsheaders',
     # local apps
     "core",
     "apis",
@@ -54,6 +58,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -165,7 +170,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PERMISSION_CLASSES": [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly']
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Django DRF Ecommerce",
