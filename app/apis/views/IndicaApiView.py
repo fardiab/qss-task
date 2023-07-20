@@ -8,6 +8,7 @@ class IndicaApiView(APIView):
     serializer_class = IndicaSerializer
 
     def get(self, request, pk=None):
+        sector_name = request.query_params.get("sector")
         subsector_name = request.query_params.get("subsector")
 
         if pk is not None:
@@ -41,7 +42,10 @@ class IndicaApiView(APIView):
                 return Response({"error": "Sector not found"}, status=404)
 
         else:
-            subsectors = SubSect.objects.all()
+            subsectors = SubSect.objects.filter(
+                sector__sector=sector_name 
+            )
+
             indicators_data = []
 
             for subsector in subsectors:
@@ -61,4 +65,5 @@ class IndicaApiView(APIView):
             for data in indicators_data:
                 indicator_name = data["indicator"]
                 combined_response[indicator_name] = indicator_name
+
             return Response(combined_response.values())
