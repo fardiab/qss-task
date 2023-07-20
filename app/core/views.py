@@ -84,7 +84,7 @@ def all(request):
     #         Country.objects.bulk_create(year_instances)
     #         year_instances = []  # Reset the list for the next chunk
     
-    return render(request, 'first_page.html')
+    return render()
     
 
 

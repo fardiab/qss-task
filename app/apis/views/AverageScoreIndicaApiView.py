@@ -42,13 +42,8 @@ class AverageScoreIndicaApiView(APIView):
             if score == 0:
                 continue
             if sector not in sector_data:
-                sector_data[sector] = {"indicators": [], "total_score": 0, "count": 0}
-            sector_data[sector]["indicators"].append(
-                {
-                    "indicator": indicator,
-                    "score": score,
-                }
-            )
+                sector_data[sector] = {"total_score": 0, "count": 0}
+
             sector_data[sector]["total_score"] += score
             sector_data[sector]["count"] += 1
 
@@ -58,7 +53,6 @@ class AverageScoreIndicaApiView(APIView):
             sector_info.append(
                 {
                     "sector": sector,
-                    "indicators": data["indicators"],
                     "average_score": average_score,
                 }
             )

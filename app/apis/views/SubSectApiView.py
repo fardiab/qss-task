@@ -8,6 +8,12 @@ class SubSectApiView(APIView):
     serializer_class = SubSectSerializer
 
     def get(self, request, pk=None):
-        subsector = SubSect.objects.all()
-        serializer = SubSectSerializer(subsector, many=True)
-        return Response(serializer.data)
+        sector = request.GET.get("sector")
+        subsector = SubSect.objects.filter(sector__sector=sector)
+
+        response_data = []
+
+        for subsect in subsector:
+            response_data.append(subsect.subsector)
+
+        return Response(response_data)

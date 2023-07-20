@@ -58,11 +58,13 @@ class SectorAverageScoreApiView(APIView):
         for sector, data in sector_data.items():
             average_score = round(data["total_score"] / data["count"], 2)
             sc += average_score
-            
-        sc = round(sc/len(sector_data), 2)
-        sector_info.append({
-            "country": country,
-            "average_score": sc,
-        })
 
-        return Response(sector_info)
+        sc = round(sc / len(sector_data), 2)
+        sector_info.append(
+            {
+                "country": country,
+                "average_score": sc,
+            }
+        )
+
+        return Response({"country": country, "average_score": sc})

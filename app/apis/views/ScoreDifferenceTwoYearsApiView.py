@@ -7,8 +7,6 @@ from operator import itemgetter
 from django.db.models import Avg, Max
 
 
-
-
 class ScoreDifferenceTwoYearsApiView(APIView):
     serializer_class = CountrySerializer
 
@@ -55,12 +53,12 @@ class ScoreDifferenceTwoYearsApiView(APIView):
             max_rank2 = data.get("max_rank2", 0)
 
             if max_rank1 != 0:
-                score1 = round((1 - avg_rank1 / max_rank1) * 100, 2)
+                score1 = 1 - avg_rank1 / max_rank1
             else:
                 score1 = 0.0
 
             if max_rank2 != 0:
-                score2 = round((1 - avg_rank2 / max_rank2) * 100, 2)
+                score2 = 1 - avg_rank2 / max_rank2
             else:
                 score2 = 0.0
 
@@ -91,9 +89,11 @@ class ScoreDifferenceTwoYearsApiView(APIView):
         # Calculate score difference
         score_difference = round(average_score1 - average_score2, 2)
 
-        response_data.append({
-            "country": country,
-            "score_difference": score_difference,
-        })
+        response_data.append(
+            {
+                "country": country,
+                "score_difference": score_difference,
+            }
+        )
 
-        return Response(response_data)
+        return Response({"country": country, "score_difference": score_difference})

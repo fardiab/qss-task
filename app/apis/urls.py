@@ -3,11 +3,13 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns = [
-    path('sectors/', SectViewSet.as_view({'get': 'list'}), name='sectors'),
+    path('sectors/', SectViewSet.as_view(), name='sectors'),
     path('subsectors/', SubSectApiView.as_view(), name='subsectors'),
     path('indicators/',  IndicaApiView.as_view(), name='indicators'),
+    path('unique-country/', UniqueCountryApiView.as_view(), name='unique_country'),
+    path('min-max-years/', MinMaxYearsApiView.as_view(), name='min_max_years'),
     path('indicators/<int:pk>/', IndicaApiView.as_view(), name='indicators-detail'),
-    path('country/', CountryApiView.as_view(), name='country'),
+    path('subsector/', CountryApiView.as_view(), name='country'),
     path('rank-difference/', RankDifferenceApiView.as_view(), name='rank_difference'),
     path('country-info/', CountryInfoApiView.as_view(), name='country_info'),
     path('country-diagram/', CountryIndicaDiagramApiView.as_view(), name='country_diagram'),

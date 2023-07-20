@@ -12,3 +12,5 @@ from .SubSectApiView import SubSectApiView
 from .SectorAverageScoreApiView import SectorAverageScoreApiView
 from .CountryScoreYearByApiView import CountryScoreYearByApiView
 from .ScoreDifferenceTwoYearsApiView import ScoreDifferenceTwoYearsApiView
+from .UniqueCountryApiView import UniqueCountryApiView
+from .MinMaxYearsApiView import MinMaxYearsApiView

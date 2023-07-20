@@ -39,7 +39,7 @@ class SectorRankDifferenceApiView(APIView):
                 rank_diff = round(rank_diff, 2)
                 sector_info = {
                     "sector": sector,
-                    "rank difference": rank_diff,
+                    "rank_difference": rank_diff,
                 }
                 response_data.append(sector_info)
 

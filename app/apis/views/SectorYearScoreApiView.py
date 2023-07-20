@@ -35,7 +35,6 @@ class SectorYearScoreApiView(APIView):
         sector_data = {}
         for data in queryset:
             rank = data["rank"]
-            sector = data["indicator__subsector__sector__sector"]
             max_rank = data["max_rank"]
             year = data["year"]
 
@@ -47,18 +46,11 @@ class SectorYearScoreApiView(APIView):
             if score == 0:
                 continue
 
-            sector_data.setdefault(sector, {"years": {}})
+            if year not in sector_data:
+                sector_data[year] = score
+            elif score > sector_data[year]:
+                sector_data[year] = score
 
-            if year not in sector_data[sector]["years"]:
-                sector_data[sector]["years"][year] = score
-            elif score > sector_data[sector]["years"][year]:
-                sector_data[sector]["years"][year] = score
+        result = [{"year": year, "score": score} for year, score in sector_data.items()]
 
-        sector_info = []
-        for sector, data in sector_data.items():
-            years = [
-                {"year": year, "score": score} for year, score in data["years"].items()
-            ]
-            sector_info.append({"sector": sector, "years": years})
-
-        return Response(sector_info)
+        return Response(result)
