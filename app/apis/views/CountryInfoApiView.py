@@ -3,6 +3,7 @@ from core.models import Country
 from apis.serializers import CountrySerializer
 from rest_framework.response import Response
 from django.db.models import Max
+from operator import itemgetter
 
 
 class CountryInfoApiView(APIView):
@@ -46,4 +47,6 @@ class CountryInfoApiView(APIView):
             }
             response_data.append(indicator_info)
 
-        return Response(sorted(response_data,lambda x:x['score']) )
+        response_data.sort(key=itemgetter("score"), reverse=True)
+
+        return Response(response_data)

@@ -56,5 +56,5 @@ class AverageScoreIndicaApiView(APIView):
                     "average_score": average_score,
                 }
             )
-        # sector_info.sort(key=itemgetter("sector", "indicators"))
+        sector_info.sort(key=itemgetter("sector"))
         return Response(sector_info)
