@@ -1,3 +1,4 @@
+from collections import defaultdict
 from rest_framework.views import APIView
 from core.models import Country, Indica
 from apis.serializers import CountrySerializer
@@ -12,43 +13,49 @@ class CountryIndicaDiagramApiView(APIView):
         selected_country = request.GET.get("country")
         sector = request.GET.get("sector")
         subsector = request.GET.get("subsector")
-        indicator_names = request.GET.getlist("indicator")
+        indicator = request.GET.getlist("indicator")
 
-        indicator_ids = Indica.objects.filter(
-            indicator__in=indicator_names
-        ).values_list("id", flat=True)
-
-        queryset = Country.objects.filter(
+        indicators = (Country.objects.filter(
             country=selected_country,
-            indicator__id__in=indicator_ids,
-            indicator__subsector__subsector=subsector,
             indicator__subsector__sector__sector=sector,
-        ).values("indicator__indicator", "year", "rank")
-
-        max_ranks = (
-            Country.objects.filter(
-                indicator__subsector__subsector=subsector,
-                indicator__subsector__sector__sector=sector,
-                indicator__id__in=indicator_ids,
-            )
-            .values("indicator__indicator")
-            .annotate(max_rank=Max("rank"))
+            indicator__subsector__subsector=subsector)
+            .prefetch_related("indicator__subsector__sector")
+            .values("indicator__indicator", "year", "rank", "indicator__subsector__sector__sector")
         )
 
-        max_rank_dict = {
-            item["indicator__indicator"]: item["max_rank"] for item in max_ranks
-        }
+        sector_rank_dict = defaultdict(list)
 
-        response_data = []
-        for data in queryset:
-            max_rank = max_rank_dict[data["indicator__indicator"]]
-            score = round((1 - data["rank"] / max_rank) * 100, 2)
+        for data in indicators:
+            sector = data["indicator__subsector__sector__sector"]
+            year = data["year"]
+            rank = data["rank"]
+            sector_rank_dict[sector].append(rank)
+
+        max_rank_dict = {}
+
+        for sector, ranks in sector_rank_dict.items():
+            max_rank_sector = max(ranks)
+            max_rank_dict[sector] = max_rank_sector
+
+        indicator_data = defaultdict(list)
+
+        for data in indicators:
+            rank = data["rank"]
+            year = data["year"]
+            indicator_name = data["indicator__indicator"]
+            max_rank = max_rank_dict[sector]
+            score = round((1 - rank/ max_rank) * 100, 2)
 
             indicator_info = {
-                "indicator": data["indicator__indicator"],
-                "year": data["year"],
+                "year": year,
                 "score": score,
             }
-            response_data.append(indicator_info)
 
+            indicator_data[indicator_name].append(indicator_info)
+
+        response_data = [{"indicator": key, "data": value} for key, value in indicator_data.items()]
+        
         return Response(response_data)
+
+
+        

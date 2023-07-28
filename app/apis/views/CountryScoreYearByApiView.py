@@ -16,7 +16,7 @@ class CountryScoreYearByApiView(APIView):
 
         indicators_data = (
             Country.objects.filter(
-                country=country, indicator__subsector__sector__sector=sector
+                country=country
             )
             .prefetch_related("indicator__subsector__sector")
             .values(

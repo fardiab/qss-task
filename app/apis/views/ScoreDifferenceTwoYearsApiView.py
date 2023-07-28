@@ -74,13 +74,16 @@ class ScoreDifferenceTwoYearsApiView(APIView):
                 continue
             total_score2 += score2
             num_sectors2 += 1
-        
+        average_score1 = 0
+        average_score2 = 0
         # Calculate average scores for both years
-        average_score1 = round(total_score1 / num_sectors1, 2)
-        average_score2 = round(total_score2 / num_sectors2, 2)
+        if num_sectors1 != 0:
+            average_score1 = round(total_score1 / num_sectors1, 2)
+        if num_sectors2 != 0:
+            average_score2 = round(total_score2 / num_sectors2, 2)
 
         # Calculate score difference
-        score_difference = round(average_score1 - average_score2, 2)
+        score_difference = round(average_score2 - average_score1, 2)
 
         response_data = {
             "country": country,

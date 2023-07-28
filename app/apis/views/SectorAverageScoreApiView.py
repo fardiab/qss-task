@@ -42,47 +42,9 @@ class SectorAverageScoreApiView(APIView):
                 continue
             total_score += score
             num_sectors += 1
-
-        average_score = round(total_score / num_sectors, 2)
+        if num_sectors == 0:
+            average_score = 0
+        else:
+            average_score = round(total_score / num_sectors, 2)
 
         return Response({"country": country, "average_score": average_score})
-
-        # sector_data = {}
-        # for data in queryset:
-        #     indicator = data["indicator__indicator"]
-        #     rank = data["rank"]
-        #     sector = data["indicator__subsector__sector__sector"]
-        #     max_rank = max_rank_dict[sector]
-        #     if rank == 0:
-        #         continue
-        #     score = (1 - rank / max_rank) * 100
-            
-        #     if score == 0:
-        #         continue
-        #     if sector not in sector_data:
-        #         sector_data[sector] = {"indicators": [], "total_score": 0, "count": 0}
-        #     sector_data[sector]["indicators"].append(
-        #         {
-        #             "indicator": indicator,
-        #             "score": score,
-        #         }
-        #     )
-        #     sector_data[sector]["total_score"] += round(score)
-        #     sector_data[sector]["count"] += 1
-        #     print(sector_data[sector]["total_score"], sector_data[sector]["count"])
-        
-        # sector_info = []
-        # sc = 0
-        # for sector, data in sector_data.items():
-        #     average_score = data["total_score"] / data["count"]
-        #     sc += average_score
-        
-        # sc = round(sc / len(sector_data), 2)
-        # sector_info.append(
-        #     {
-        #         "country": country,
-        #         "average_score": sc,
-        #     }
-        # )
-
-        # return Response({"country": country, "average_score": sc})

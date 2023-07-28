@@ -53,4 +53,6 @@ class SectorYearScoreApiView(APIView):
 
         result = [{"year": year, "score": score} for year, score in sector_data.items()]
 
+        result.sort(key=lambda x: x["year"])
+
         return Response(result)
