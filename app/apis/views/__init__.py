@@ -14,3 +14,8 @@ from .CountryScoreYearByApiView import CountryScoreYearByApiView
 from .ScoreDifferenceTwoYearsApiView import ScoreDifferenceTwoYearsApiView
 from .UniqueCountryApiView import UniqueCountryApiView
 from .MinMaxYearsApiView import MinMaxYearsApiView
+from .BarChartApiView import BarChartApiView
+from .LineChartApiView import LineChartApiView
+from .BumpChartApiView import BumpChartApiView
+from .YearApiView import YearApiView
+from .MinMaxRankApiView import MinMaxRankApiView

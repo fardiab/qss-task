@@ -42,9 +42,7 @@ class IndicaApiView(APIView):
                 return Response({"error": "Sector not found"}, status=404)
 
         else:
-            subsectors = SubSect.objects.filter(
-                sector__sector=sector_name 
-            )
+            subsectors = SubSect.objects.filter(subsector=subsector_name)
 
             indicators_data = []
 

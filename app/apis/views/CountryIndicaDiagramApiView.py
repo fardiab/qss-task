@@ -13,7 +13,6 @@ class CountryIndicaDiagramApiView(APIView):
         selected_country = request.GET.get("country")
         sector = request.GET.get("sector")
         subsector = request.GET.get("subsector")
-        indicator = request.GET.getlist("indicator")
 
         indicators = (Country.objects.filter(
             country=selected_country,

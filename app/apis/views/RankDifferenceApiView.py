@@ -1,3 +1,4 @@
+from collections import defaultdict
 from rest_framework.views import APIView
 from core.models import Country
 from apis.serializers import RankDiffrenceSerializer
@@ -5,38 +6,49 @@ from rest_framework.response import Response
 
 
 class RankDifferenceApiView(APIView):
-    serializer_class = RankDiffrenceSerializer
-
     def get(self, request):
-        selected_countries = request.GET.getlist("country")
+        countries = request.GET.getlist("country")
         indicator = request.GET.get("indicator")
         year1 = request.GET.get("year1")
         year2 = request.GET.get("year2")
+        sector = request.GET.get("sector")
+        subsector = request.GET.get("subsector")
 
-        rank_diff_by_country = {}
-
+        # Get data for year1
         queryset1 = Country.objects.filter(
-            indicator__indicator=indicator, year=year1, country__in=selected_countries
+            country__in=countries,
+            indicator__indicator=indicator,
+            # indicator__subsector__sector__sector=sector,
+            # indicator__subsector__subsector=subsector,
+            year=year1,
         ).values("country", "rank")
 
+        # Get data for year2
         queryset2 = Country.objects.filter(
-            indicator__indicator=indicator, year=year2, country__in=selected_countries
+            country__in=countries,
+            indicator__indicator=indicator,
+            # indicator__subsector__sector__sector=sector,
+            # indicator__subsector__subsector=subsector,
+            year=year2,
         ).values("country", "rank")
 
-        for data1, data2 in zip(queryset1, queryset2):
-            country = data1["country"]
-            rank1 = data1["rank"]
-            rank2 = data2["rank"]
+        # Create a dictionary to store rank data for year1
+        rank_by_country_year1 = {entry["country"]: entry["rank"] for entry in queryset1}
 
-            rank_diff = rank1 - rank2
+        # Create a dictionary to store rank data for year2
+        rank_by_country_year2 = {entry["country"]: entry["rank"] for entry in queryset2}
 
-            if country not in rank_diff_by_country:
-                rank_diff_by_country[country] = rank_diff
+        # Create a dictionary to store rank difference
+        rank_diff_by_country = defaultdict(dict)
 
-        rank_diff_response = {
-            "year1": year1,
-            "year2": year2,
-            "rank_diff": rank_diff_by_country,
-        }
+        for country in countries:
+            # Check if the country has rank data for both years
+            if country in rank_by_country_year1 and country in rank_by_country_year2:
+                rank_diff_by_country[country] = {
+                    "year1": rank_by_country_year1[country],
+                    "year2": rank_by_country_year2[country],
+                    "difference": rank_by_country_year1[country]
+                    - rank_by_country_year2[country],
+                }
 
-        return Response(rank_diff_response)
+        return Response(rank_diff_by_country)
