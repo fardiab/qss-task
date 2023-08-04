@@ -7,6 +7,7 @@ class Country(models.Model):
         Indica, on_delete=models.CASCADE, null=True, blank=True
     )
     country = models.CharField(max_length=100)
+    country_code = models.CharField(max_length=100, null=True, blank=True)
     rank = models.BigIntegerField(null=True, blank=True)
     amount = models.CharField(max_length=100, null=True, blank=True)
     year = models.CharField(max_length=100, null=True, blank=True)
