@@ -18,13 +18,13 @@ class ScoreDifferenceTwoYearsApiView(APIView):
         indicators_data1 = (
             Country.objects.filter(country=country, year=year1)
             .prefetch_related("indicator__subsector__sector")
-            .values("year", "indicator__subsector__sector__sector", "rank")
+            .values("year", "indicator__subsector__sector__sector", "rank", "country_code")
         )
 
         indicators_data2 = (
             Country.objects.filter(country=country, year=year2)
             .prefetch_related("indicator__subsector__sector")
-            .values("year", "indicator__subsector__sector__sector", "rank")
+            .values("year", "indicator__subsector__sector__sector", "rank", "country_code")
         )
 
         max_rank_dict1 = {}
@@ -88,6 +88,7 @@ class ScoreDifferenceTwoYearsApiView(APIView):
         response_data = {
             "country": country,
             "score_difference": score_difference,
+            "country_code": data["country_code"],
         }
 
         return Response(response_data)

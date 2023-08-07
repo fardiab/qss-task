@@ -19,3 +19,4 @@ from .LineChartApiView import LineChartApiView
 from .BumpChartApiView import BumpChartApiView
 from .YearApiView import YearApiView
 from .MinMaxRankApiView import MinMaxRankApiView
+from .DescriptionApiView import DescriptionApiView

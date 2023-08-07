@@ -12,6 +12,7 @@ urlpatterns = [
     path('country/', CountryApiView.as_view(), name='country'),
     path('years/', YearApiView.as_view(), name='years'),
     path('min-max-rank/', MinMaxRankApiView.as_view(), name='min_max_rank'),
+    path('description/', DescriptionApiView.as_view(), name='description'),
     #first dashboard
     path('bar-chart/', BarChartApiView.as_view(), name='bar_chart'),
     path('rank-difference/', RankDifferenceApiView.as_view(), name='rank_difference'),
