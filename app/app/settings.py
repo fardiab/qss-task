@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     # local apps
     "core",
     "apis",
+    "users",
+    "profiles",
 ]
 
 MIDDLEWARE = [
@@ -178,3 +180,5 @@ SPECTACULAR_SETTINGS = {
 }
 
 GRAPHENE = {"SCHEMA": "django_root.schema.schema"}
+
+AUTH_USER_MODEL = "users.User"

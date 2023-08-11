@@ -27,11 +27,19 @@ class DescriptionApiView(APIView):
             indicator = data["indicator__indicator"]
             content = data["indicator__content"]
 
+            if content is not None:
+                content = content.replace("\n", " ")
+                content = content.replace("\r", " ")
+                content = content.replace("\t", " ")
+                content = content.replace("   ", " ")
+                content = content.replace("\\", " ")
+
             response_data[subsector].append(
                 {
                     "indicator": indicator,
                     "content": content if content else "No description",
                 }
             )
+
 
         return Response(response_data)

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <label for="first_name">First Name</label>
+            <input type="text" name="first_name" placeholder="First Name">
+        </div><br>
+        <div>
+            <label for="last_name">Last Name</label>
+            <input type="text" name="last_name" placeholder="Last Name">
+        </div><br>
+        <div>
+            <label for="gender">Gender</label>
+            <input type="text" name="gender" placeholder="Gender">
+        </div><br>
+        <div>
+            <label for="phone_number">Phone Number</label>
+            <input type="text" name="phone_number" placeholder="Phone Number">
+        </div><br>
+        <div>
+            <label for="company">Company</label>
+            <input type="text" name="company" placeholder="Company">
+        </div><br>
+        <div>
+            <label for="industry">Industry</label>
+            <input type="text" name="industry" placeholder="Industry">
+        </div><br>
+        <div>
+            <label for="job_title">Job Title</label>
+            <input type="text" name="job_title" placeholder="Job Title">
+        </div><br>
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" placeholder="Email">
+        </div><br>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" placeholder="Password">
+        </div><br>
+        <div>
+            <input type="submit" name="submit" value="Submit">
+        </div>
+    </form>
+    </div>
+</body>
+</html>

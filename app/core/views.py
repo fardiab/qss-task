@@ -69,6 +69,7 @@ def all(request):
     #         for _, row in chunk.iterrows():
     #             indicator_name = row['Indicator']
     #             country_name = row['Country']
+    #             country_code2 = row['Country_code_2']
     #             country_code = row['Country_code']
     #             rank = row['Rank']
     #             amount = row['Amount']
@@ -78,7 +79,7 @@ def all(request):
     #             indicator = Indica.objects.get(indicator=indicator_name) if indicator_name else None
     
     #             # Create the Year instance with the related indicator and year value
-    #             year_instance = Country(indicator=indicator, year=year, rank=rank, amount=amount, country=country_name, country_code=country_code)
+    #             year_instance = Country(indicator=indicator, year=year, rank=rank, amount=amount, country=country_name, country_code=country_code, country_code2=country_code2)
     #             year_instances.append(year_instance)
     
     #         # Bulk create Year instances for each chunk
@@ -129,15 +130,15 @@ def all(request):
 
 
 
-    indicators_without_description = Indica.objects.filter(content__isnull=True)
-    indicator_with_description = Indica.objects.filter(content__isnull=False)
+    # indicators_without_description = Indica.objects.filter(content__isnull=True)
+    # indicator_with_description = Indica.objects.filter(content__isnull=False)
 
-    # Print the names of indicators without descriptions
-    for indicator in indicators_without_description:
-        print({"Not full of ":  indicator})
+    # # Print the names of indicators without descriptions
+    # for indicator in indicators_without_description:
+    #     print({"Not full of ":  indicator})
 
-    for indicator in indicator_with_description:
-        print({"full of ": indicator})
+    # for indicator in indicator_with_description:
+    #     print({"full of ": indicator})
 
     # sectors = Sect.objects.all()
 

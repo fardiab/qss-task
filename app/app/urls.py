@@ -47,6 +47,8 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("api/", include("apis.urls")),
+    path("a2/", include("users.urls")),
+    path("a3/", include("profiles.urls")),
     path("__debug__/", include(debug_toolbar.urls)),
     path("graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
 ]
